@@ -9,13 +9,16 @@ Created on Fri Aug  3 13:47:20 2018
 import cv2
 import numpy as np
 
-img=cv2.imread('ocr/Bottom Left_Chassis Number_0.jpg')
+
+img=cv2.imread('ocr/Top Center_Container Number_0.jpg')
 if img is not None:
     cv2.imshow('Original Image',img)
     
 else:
     print('Error Loading Image')
 
+dim = (128, 128)
+ 
 gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 ret,thresh = cv2.threshold(gray,70,255,cv2.THRESH_BINARY_INV)
 cv2.imshow('Threshold Image', thresh)
@@ -34,11 +37,13 @@ sorted_ctrs = sorted(cntrs, key=lambda ctr: cv2.boundingRect(ctr)[0])
 for i, ctr in enumerate(sorted_ctrs):
     x, y, w, h = cv2.boundingRect(ctr)
  
-    roi = img[y:y+h, x:x+w]
+    roi = img[y-5:y+h+5, x-5:x+w+5]
  
     #cv2.rectangle(image,(x,y),( (x+5) + (w+5), (y+5) + (h+5) ),(255,0,0),2)
  
-    if 50> w >5 and 50> h > 5:
-        cv2.imwrite('ocr/{}.png'.format(i), roi)
+    if 50> w >2 and 50> h > 5:
+        resized = cv2.resize(roi, dim, interpolation = cv2.INTER_AREA)
+        thresh, img_bw = cv2.threshold(resized, 70, 255, cv2.THRESH_BINARY)
+        cv2.imwrite('ocr/{}.jpg'.format(i), img_bw)
 cv2.waitKey(0)
 cv2.destroyAllWindows()
